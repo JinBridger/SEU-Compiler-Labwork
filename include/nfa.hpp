@@ -9,28 +9,28 @@
 // convert regexpr to nfa
 class nfa {
 public:
-    static nfa_item convert(std::string regexpr) {
-        std::stack<nfa_item> stk;
+    static fa convert(std::string regexpr) {
+        std::stack<fa> stk;
         for (int i = 0; i < regexpr.length(); ++i) {
             if (regexpr[i] != '@' && regexpr[i] != '|' && regexpr[i] != '*')
                 stk.push(create_nfa(regexpr[i]));
 
             if (regexpr[i] == '@') {
-                nfa_item b = stk.top();
+                fa b = stk.top();
                 stk.pop();
-                nfa_item a = stk.top();
+                fa a = stk.top();
                 stk.pop();
                 stk.push(joint_nfa(a, b));
             }
             if (regexpr[i] == '|') {
-                nfa_item b = stk.top();
+                fa b = stk.top();
                 stk.pop();
-                nfa_item a = stk.top();
+                fa a = stk.top();
                 stk.pop();
                 stk.push(union_nfa(a, b));
             }
             if (regexpr[i] == '*') {
-                nfa_item a = stk.top();
+                fa a = stk.top();
                 stk.pop();
                 stk.push(kleene_nfa(a));
             }
@@ -40,14 +40,14 @@ public:
 
 private:
     // create nfa for each character
-    static nfa_item create_nfa(char c) {
-        nfa_item new_nfa(2);
+    static fa create_nfa(char c) {
+        fa new_nfa(2);
         new_nfa.add_edge(0, 1, c);
         return new_nfa;
     }
 
-    static nfa_item union_nfa(nfa_item a, nfa_item b) {
-        nfa_item new_nfa(a._total_status + b._total_status + 2);
+    static fa union_nfa(fa a, fa b) {
+        fa new_nfa(a._total_status + b._total_status + 2);
 
         // a node: [1, a._total_status]
         // b node: [a._total_status + 1, a._total_status + b._total_status]
@@ -69,8 +69,8 @@ private:
         return new_nfa;
     }
 
-    static nfa_item joint_nfa(nfa_item a, nfa_item b) {
-        nfa_item new_nfa(a._total_status + b._total_status - 1);
+    static fa joint_nfa(fa a, fa b) {
+        fa new_nfa(a._total_status + b._total_status - 1);
 
         // a node: [0, a._total_status - 1]
         // b node: [a._total_status - 1, a._total_status + b._total_status - 2]
@@ -88,8 +88,8 @@ private:
         return new_nfa;
     }
 
-    static nfa_item kleene_nfa(nfa_item a) {
-        nfa_item new_nfa(a._total_status + 3);
+    static fa kleene_nfa(fa a) {
+        fa new_nfa(a._total_status + 3);
 
         // a node: [2, a._total_status + 1]
         int offset_a = 2;

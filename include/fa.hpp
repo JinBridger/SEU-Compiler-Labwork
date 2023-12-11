@@ -6,8 +6,8 @@
 
 // actually, it is a graph
 // use '@' for epsilon
-struct nfa_item {
-    nfa_item(int total_status) : _total_status(total_status), _head(std::vector<int>(total_status, -1)) {}
+struct fa {
+    fa(int total_status) : _total_status(total_status), _head(std::vector<int>(total_status, -1)) {}
 
     int _total_status = 0;
     // start status is default 0
