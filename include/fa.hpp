@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -11,7 +12,8 @@ struct fa {
 
     int _total_status = 0;
     // start status is default 0
-    // accept status is total status - 1
+    // for nfa, accept status is total status - 1
+    // for dfa, accept status is _accept_status
 
     struct edge {
         int  _to, _next;
@@ -19,6 +21,9 @@ struct fa {
     };
     std::vector<int>  _head;
     std::vector<edge> _edge;
+
+    std::set<char> _symbols;
+    std::set<int>  _accept_status;
 
     void add_edge(int from, int to, char c) {
         _edge.push_back(edge());
@@ -29,7 +34,7 @@ struct fa {
     }
 
     void print() {
-        for (int i = 0; i < _total_status - 1; ++i) {
+        for (int i = 0; i < _total_status; ++i) {
             if (_head[i] == -1)
                 continue;
             std::cout << "Status " + std::to_string(i) << std::endl;

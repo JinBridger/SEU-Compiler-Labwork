@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fa.hpp"
+#include "regexpr.hpp"
 
 #include <stack>
 #include <string>
@@ -35,7 +36,9 @@ public:
                 stk.push(kleene_nfa(a));
             }
         }
-        return stk.top();
+        auto result     = stk.top();
+        result._symbols = regexpr::get_all_character(regexpr);
+        return result;
     }
 
 private:

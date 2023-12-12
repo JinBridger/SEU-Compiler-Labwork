@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <stack>
 #include <string>
 
@@ -8,6 +9,14 @@ class regexpr {
 public:
     static std::string convert(std::string regexpr) {
         return convert_to_postfix(add_connect_operator(regexpr));
+    }
+
+    static std::set<char> get_all_character(std::string regexpr) {
+        std::set<char> result;
+        for (auto ch : regexpr)
+            if (!is_regexpr_operator(ch))
+                result.insert(ch);
+        return result;
     }
 
 private:
