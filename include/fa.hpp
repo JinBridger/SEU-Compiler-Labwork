@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <ostream>
 #include <set>
 #include <string>
 #include <vector>
@@ -41,5 +42,9 @@ struct fa {
             for (int idx = _head[i]; idx != -1; idx = _edge[idx]._next)
                 std::cout << "    --" << _edge[idx]._ch << "--> " << std::to_string(_edge[idx]._to) << std::endl;
         }
+        std::cout << "Accept states: ";
+        for (auto i : _accept_status)
+            std::cout << i << " ";
+        std::cout << std::endl;
     }
 };

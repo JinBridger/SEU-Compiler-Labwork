@@ -67,9 +67,11 @@ public:
             if (it._is_acceptable)
                 new_dfa._accept_status.insert(it._id);
 
+        new_dfa._symbols = nfa._symbols;
         return new_dfa;
     }
 
+private:
     static std::set<int> find_epsilon_closure(fa nfa, int start) {
         std::set<int>    result;
         std::queue<int>  tmp;
