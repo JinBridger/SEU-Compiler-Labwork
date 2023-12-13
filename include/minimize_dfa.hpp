@@ -33,26 +33,26 @@ public:
         }
 
         for (auto i : dfa._accept_status)
-            new_dfa._accept_status.insert(in_which_group(final_group, i));
+            new_dfa._accept_status[in_which_group(final_group, i.first)] = i.second;
         return new_dfa;
     }
 
 private:
     static std::vector<std::vector<int>> init_split(fa dfa) {
         // split accept & non-accept
-        std::vector<std::vector<int>> result(2);
+        auto result              = std::vector<std::vector<int>>();
+        auto total_accept_status = std::set<int>();
         for (int i = 0; i < dfa._total_status; ++i) {
-            bool is_accept = false;
-            for (auto state : dfa._accept_status) {
-                if (i == state) {
-                    is_accept = true;
-                    break;
+            total_accept_status.insert(dfa._accept_status[i]);
+        }
+        for (auto accept_status : total_accept_status) {
+            std::vector<int> tmp_group;
+            for (int i = 0; i < dfa._total_status; ++i) {
+                if (dfa._accept_status[i] == accept_status) {
+                    tmp_group.push_back(i);
                 }
             }
-            if (!is_accept)
-                result[0].push_back(i);
-            else
-                result[1].push_back(i);
+            result.push_back(tmp_group);
         }
         return result;
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <map>
 #include <ostream>
 #include <set>
 #include <string>
@@ -9,7 +10,11 @@
 // actually, it is a graph
 // use '@' for epsilon
 struct fa {
-    fa(int total_status) : _total_status(total_status), _head(std::vector<int>(total_status, -1)) {}
+    fa(int total_status) : _total_status(total_status), _head(std::vector<int>(total_status, -1)) {
+        for (int i = 0; i < total_status; ++i) {
+            _accept_status[i] = -1;
+        }
+    }
 
     int _total_status = 0;
     // start status is default 0
@@ -24,7 +29,9 @@ struct fa {
     std::vector<edge> _edge;
 
     std::set<char> _symbols;
-    std::set<int>  _accept_status;
+    // std::set<int>      _accept_status;
+    // key: status, value: token enum in int
+    std::map<int, int> _accept_status;
 
     void add_edge(int from, int to, char c) {
         _edge.push_back(edge());
@@ -42,9 +49,8 @@ struct fa {
             for (int idx = _head[i]; idx != -1; idx = _edge[idx]._next)
                 std::cout << "    --" << _edge[idx]._ch << "--> " << std::to_string(_edge[idx]._to) << std::endl;
         }
-        std::cout << "Accept states: ";
+        std::cout << "Accept states:" << std::endl;
         for (auto i : _accept_status)
-            std::cout << i << " ";
-        std::cout << std::endl;
+            std::cout << "    " << i.first << ": " << i.second << std::endl;
     }
 };

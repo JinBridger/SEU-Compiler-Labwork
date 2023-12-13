@@ -10,7 +10,7 @@
 // convert regexpr to nfa
 class nfa {
 public:
-    static fa convert(std::string regexpr) {
+    static fa convert(std::string regexpr, int target_enum) {
         std::stack<fa> stk;
         for (int i = 0; i < regexpr.length(); ++i) {
             if (regexpr[i] != '@' && regexpr[i] != '|' && regexpr[i] != '*')
@@ -38,7 +38,32 @@ public:
         }
         auto result     = stk.top();
         result._symbols = regexpr::get_all_character(regexpr);
+
+        result._accept_status[result._total_status - 1] = target_enum;
         return result;
+    }
+
+    static fa combine_nfas(std::vector<fa> nfas) {
+        int total_states = 0;
+        for (auto nfa : nfas)
+            total_states += nfa._total_status;
+        fa  new_nfa(total_states + 1);
+        int offset = 1;
+        for (auto nfa : nfas) {
+            int state_in_nfa = 0;
+            for (; state_in_nfa < nfa._total_status; ++state_in_nfa)
+                for (int i = nfa._head[state_in_nfa]; i != -1; i = nfa._edge[i]._next) {
+                    new_nfa.add_edge(state_in_nfa + offset, nfa._edge[i]._to + offset, nfa._edge[i]._ch);
+                }
+            for (auto i : nfa._accept_status) {
+                new_nfa._accept_status[i.first + offset] = i.second;
+            }
+            new_nfa.add_edge(0, offset, '@');
+            for (auto symbol : nfa._symbols)
+                new_nfa._symbols.insert(symbol);
+            offset += nfa._total_status;
+        }
+        return new_nfa;
     }
 
 private:

@@ -10,9 +10,9 @@
 #include <vector>
 
 struct dfa_item {
-    dfa_item(int id, bool acceptable, std::set<int> states) : _id(id), _is_acceptable(acceptable), _states(states) {}
-    int  _id;
-    bool _is_acceptable;
+    dfa_item(int id, int target_enum, std::set<int> states) : _id(id), _target_enum(target_enum), _states(states) {}
+    int _id;
+    int _target_enum;
 
     std::set<int> _states;
 };
@@ -28,7 +28,7 @@ public:
         std::vector<std::map<char, int>> table;
 
         dfa_states.push_back(
-            dfa_item(total_states++, is_acceptable(nfa, start_epsilon_closure), start_epsilon_closure));
+            dfa_item(total_states++, get_target_enum(nfa, start_epsilon_closure), start_epsilon_closure));
         int current_state = 0;
         // fill in table
         do {
@@ -47,7 +47,7 @@ public:
                     }
                 }
                 // new state
-                dfa_states.push_back(dfa_item(total_states++, is_acceptable(nfa, closure), closure));
+                dfa_states.push_back(dfa_item(total_states++, get_target_enum(nfa, closure), closure));
                 table[current_state][ch] = total_states - 1;
             next_char:
                 continue;
@@ -64,8 +64,8 @@ public:
 
         // add accept states
         for (auto it : dfa_states)
-            if (it._is_acceptable)
-                new_dfa._accept_status.insert(it._id);
+            if (it._target_enum != -1)
+                new_dfa._accept_status[it._id] = it._target_enum;
 
         new_dfa._symbols = nfa._symbols;
         return new_dfa;
@@ -115,10 +115,10 @@ private:
         return result;
     }
 
-    static bool is_acceptable(fa nfa, std::set<int> states) {
+    static int get_target_enum(fa nfa, std::set<int> states) {
         for (auto state : states)
-            if (state == nfa._total_status - 1)
-                return true;
-        return false;
+            if (nfa._accept_status[state] != -1)
+                return nfa._accept_status[state];
+        return -1;
     }
 };
