@@ -3,80 +3,109 @@
 #include <set>
 #include <stack>
 #include <string>
+#include <vector>
+
+struct reg_char {
+    reg_char(char v, bool is_op) : _value(v), _is_operator(is_op) {}
+    char _value;
+    bool _is_operator;
+};
+
+struct reg_string {
+    std::vector<reg_char> _value;
+};
 
 // convert to postfix expr
 class regexpr {
 public:
-    static std::string convert(std::string regexpr) {
-        return convert_to_postfix(add_connect_operator(regexpr));
+    static reg_string convert(std::string regexpr) {
+        return convert_to_postfix(add_connect_operator(convert_reg_string(regexpr)));
     }
 
-    static std::set<char> get_all_character(std::string regexpr) {
+    static std::set<char> get_all_character(reg_string regexpr) {
         std::set<char> result;
-        for (auto ch : regexpr)
-            if (!is_regexpr_operator(ch))
-                result.insert(ch);
+        for (auto ch : regexpr._value)
+            if (!ch._is_operator)
+                result.insert(ch._value);
         return result;
     }
 
 private:
+    static reg_string convert_reg_string(std::string regexpr) {
+        reg_string result;
+        for (int i = 0; i < regexpr.length(); ++i) {
+            if (regexpr[i] == '\\') {
+                i++;
+                result._value.push_back(reg_char(regexpr[i], false));
+                continue;
+            }
+            if (is_regexpr_operator(regexpr[i])) {
+                result._value.push_back(reg_char(regexpr[i], true));
+            }
+            else {
+                result._value.push_back(reg_char(regexpr[i], false));
+            }
+        }
+        return result;
+    }
+
     // operator priority: * > | > @
-    static std::string add_connect_operator(std::string regexpr) {
-        std::string new_regexpr = "";
-        new_regexpr += regexpr[0];
-        for (int i = 1; i < regexpr.length(); ++i) {
+    static reg_string add_connect_operator(reg_string regexpr) {
+        reg_string new_regexpr;
+        new_regexpr._value.push_back(regexpr._value[0]);
+        for (int i = 1; i < regexpr._value.size(); ++i) {
             bool add_connect = false;
 
-            char curr_char = regexpr[i];
-            char last_char = new_regexpr[new_regexpr.length() - 1];
+            auto curr_char = regexpr._value[i];
+            auto last_char = new_regexpr._value[new_regexpr._value.size() - 1];
 
             // case 1: add between 2 non-operator character
-            if (!is_regexpr_operator(last_char) && !is_regexpr_operator(curr_char))
+            if (!last_char._is_operator && !curr_char._is_operator)
                 add_connect = true;
 
             // case 2: add between non-operator and '('
-            if (!is_regexpr_operator(last_char) && curr_char == '(')
+            if (!last_char._is_operator && curr_char._is_operator && curr_char._value == '(')
                 add_connect = true;
 
             // case 3: add between ')' and non-operator
-            if (last_char == ')' && !is_regexpr_operator(curr_char))
+            if (last_char._is_operator && last_char._value == ')' && !curr_char._is_operator)
                 add_connect = true;
 
             // case 4: add between '*' and non-operator
-            if (last_char == '*' && !is_regexpr_operator(curr_char))
+            if (last_char._is_operator && last_char._value == '*' && !curr_char._is_operator)
                 add_connect = true;
 
             // case 5: add between '*' and '('
-            if (last_char == '*' && curr_char == '(')
+            if (last_char._is_operator && last_char._value == '*' && curr_char._is_operator && curr_char._value == '(')
                 add_connect = true;
 
             if (add_connect)
-                new_regexpr += '@';
+                new_regexpr._value.push_back(reg_char('@', true));
 
-            new_regexpr += curr_char;
+            new_regexpr._value.push_back(curr_char);
         }
         return new_regexpr;
     }
 
-    static std::string convert_to_postfix(std::string regexpr) {
-        std::stack<char> operator_stack;
-        std::stack<char> intermediate_stack;
-        for (int i = 0; i < regexpr.length(); ++i) {
+    static reg_string convert_to_postfix(reg_string regexpr) {
+        std::stack<reg_char> operator_stack;
+        std::stack<reg_char> intermediate_stack;
+        for (int i = 0; i < regexpr._value.size(); ++i) {
             // non-operator
-            if (!is_regexpr_operator(regexpr[i])) {
-                intermediate_stack.push(regexpr[i]);
+            if (!regexpr._value[i]._is_operator) {
+                intermediate_stack.push(regexpr._value[i]);
                 continue;
             }
 
             // left parenthese
-            if (regexpr[i] == '(') {
-                operator_stack.push(regexpr[i]);
+            if (regexpr._value[i]._is_operator && regexpr._value[i]._value == '(') {
+                operator_stack.push(regexpr._value[i]);
                 continue;
             }
 
             // right parenthese
-            if (regexpr[i] == ')') {
-                while (operator_stack.top() != '(') {
+            if (regexpr._value[i]._is_operator && regexpr._value[i]._value == ')') {
+                while (!(operator_stack.top()._value == '(' && operator_stack.top()._is_operator)) {
                     intermediate_stack.push(operator_stack.top());
                     operator_stack.pop();
                 }
@@ -85,28 +114,28 @@ private:
             }
 
             // other operators
-            while (!operator_stack.empty() && operator_stack.top() != '('
-                   && !compare_priority(regexpr[i], operator_stack.top())) {
+            while (!operator_stack.empty() && !(operator_stack.top()._value == '(' && operator_stack.top()._is_operator)
+                   && !compare_priority(regexpr._value[i]._value, operator_stack.top()._value)) {
                 intermediate_stack.push(operator_stack.top());
                 operator_stack.pop();
             }
 
-            operator_stack.push(regexpr[i]);
+            operator_stack.push(regexpr._value[i]);
         }
         while (!operator_stack.empty()) {
             intermediate_stack.push(operator_stack.top());
             operator_stack.pop();
         }
 
-        std::stack<char> revert_stack;
+        std::stack<reg_char> revert_stack;
         while (!intermediate_stack.empty()) {
             revert_stack.push(intermediate_stack.top());
             intermediate_stack.pop();
         }
 
-        std::string new_regexpr = "";
+        reg_string new_regexpr;
         while (!revert_stack.empty()) {
-            new_regexpr += revert_stack.top();
+            new_regexpr._value.push_back(revert_stack.top());
             revert_stack.pop();
         }
 

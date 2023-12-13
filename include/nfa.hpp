@@ -10,27 +10,27 @@
 // convert regexpr to nfa
 class nfa {
 public:
-    static fa convert(std::string regexpr, int target_enum) {
+    static fa convert(reg_string regexpr, int target_enum) {
         std::stack<fa> stk;
-        for (int i = 0; i < regexpr.length(); ++i) {
-            if (regexpr[i] != '@' && regexpr[i] != '|' && regexpr[i] != '*')
-                stk.push(create_nfa(regexpr[i]));
+        for (int i = 0; i < regexpr._value.size(); ++i) {
+            if (!regexpr._value[i]._is_operator)
+                stk.push(create_nfa(regexpr._value[i]._value));
 
-            if (regexpr[i] == '@') {
+            if (regexpr._value[i]._is_operator && regexpr._value[i]._value == '@') {
                 fa b = stk.top();
                 stk.pop();
                 fa a = stk.top();
                 stk.pop();
                 stk.push(joint_nfa(a, b));
             }
-            if (regexpr[i] == '|') {
+            if (regexpr._value[i]._is_operator && regexpr._value[i]._value == '|') {
                 fa b = stk.top();
                 stk.pop();
                 fa a = stk.top();
                 stk.pop();
                 stk.push(union_nfa(a, b));
             }
-            if (regexpr[i] == '*') {
+            if (regexpr._value[i]._is_operator && regexpr._value[i]._value == '*') {
                 fa a = stk.top();
                 stk.pop();
                 stk.push(kleene_nfa(a));
