@@ -19,7 +19,7 @@ struct reg_string {
 class regexpr {
 public:
     static reg_string convert(std::string regexpr) {
-        return convert_to_postfix(add_connect_operator(convert_reg_string(regexpr)));
+        return convert_to_postfix(add_connect_operator(convert_reg_string(replace_keyword(regexpr))));
     }
 
     static std::set<char> get_all_character(reg_string regexpr) {
@@ -31,6 +31,34 @@ public:
     }
 
 private:
+    static std::string replace_keyword(std::string regexpr) {
+        // replace a-z
+        while (true) {
+            auto pos = regexpr.find("a-z");
+            if (pos == std::string::npos) {
+                break;
+            }
+            regexpr.replace(pos, 3, "a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z");
+        }
+        // replace A-Z
+        while (true) {
+            auto pos = regexpr.find("A-Z");
+            if (pos == std::string::npos) {
+                break;
+            }
+            regexpr.replace(pos, 3, "A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z");
+        }
+        // replace 0-9
+        while (true) {
+            auto pos = regexpr.find("0-9");
+            if (pos == std::string::npos) {
+                break;
+            }
+            regexpr.replace(pos, 3, "0|1|2|3|4|5|6|7|8|9");
+        }
+        return regexpr;
+    }
+
     static reg_string convert_reg_string(std::string regexpr) {
         reg_string result;
         for (int i = 0; i < regexpr.length(); ++i) {
