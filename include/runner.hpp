@@ -1,6 +1,7 @@
 #pragma once
 #include "fa.hpp"
 
+#include <functional>
 #include <map>
 
 struct runnable_fa {
@@ -28,7 +29,7 @@ class runner {
 public:
     // return value:
     // -1: failed, 0: eof
-    static int run(fa f, std::string s, std::map<int, std::string> table) {
+    static int run(fa f, std::string s, std::map<int, std::function<void(void)>> table) {
         int  pos     = 0;
         auto exec    = runnable_fa(f);
         bool reseted = true;
@@ -49,7 +50,7 @@ public:
                     }
                 }
                 // ok, match, reset it and retry!
-                std::cout << "MATCH: " << table[result] << std::endl;
+                table[result]();
                 exec.reset();
                 reseted = true;
                 continue;
@@ -60,7 +61,7 @@ public:
                 if (result == -1) {
                     return -1;
                 }
-                std::cout << "MATCH: " << table[result] << std::endl;
+                table[result]();
             }
 
             pos++;

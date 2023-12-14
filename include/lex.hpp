@@ -7,6 +7,7 @@
 #include "regexpr.hpp"
 #include "runner.hpp"
 
+#include <functional>
 #include <map>
 #include <string>
 #include <tuple>
@@ -16,13 +17,13 @@ class lex {
 public:
     lex() : _total_enums(101) {}
 
-    void add_regexpr(std::string reg, std::string name) {
-        _regs.push_back(std::tuple<std::string, std::string, int>(reg, name, _total_enums++));
+    void add_regexpr(std::string reg, std::function<void(void)> func) {
+        _regs.push_back(std::tuple<std::string, std::function<void(void)>, int>(reg, func, _total_enums++));
     }
 
-    void match(std::string prog) {
-        std::map<int, std::string> table;
-        std::vector<fa>            fas;
+    void execute(std::string prog) {
+        std::map<int, std::function<void(void)>> table;
+        std::vector<fa>                          fas;
         for (auto it : _regs) {
             table[std::get<2>(it)] = std::get<1>(it);
             auto reg_s             = regexpr::convert(std::get<0>(it));
@@ -44,5 +45,5 @@ public:
 private:
     int _total_enums;
 
-    std::vector<std::tuple<std::string, std::string, int>> _regs;
+    std::vector<std::tuple<std::string, std::function<void(void)>, int>> _regs;
 };
