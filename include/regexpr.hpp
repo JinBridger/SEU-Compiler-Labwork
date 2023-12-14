@@ -64,6 +64,14 @@ private:
         for (int i = 0; i < regexpr.length(); ++i) {
             if (regexpr[i] == '\\') {
                 i++;
+                if (regexpr[i] == 'n') {
+                    result._value.push_back(reg_char('\n', false));
+                    continue;
+                }
+                if (regexpr[i] == 't') {
+                    result._value.push_back(reg_char('\t', false));
+                    continue;
+                }
                 result._value.push_back(reg_char(regexpr[i], false));
                 continue;
             }
