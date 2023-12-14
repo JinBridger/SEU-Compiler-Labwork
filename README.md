@@ -1,10 +1,34 @@
-# SEU Compiler Labwork
+# JLex: A Simple Lex Implementation for SEU Compiler Labwork
 
-🚧 !UNDER CONSTRUCTION! 🚧
+## Usage
 
-Compiler Labwork in Dr. Zhang Zhizheng's course.
+### .l file format
 
-Including two projects:
+Almost the same with flex.
+However, JLex doesn't support definition.
 
-- Lexical Analyzer Programming
-- Syntax Parser Programming
+```lex
+%{
+    code that you want to insert at the BEGINNING of lex.yy.cpp
+%}
+
+%%
+
+regular_expression  →  { code that execute when MATCH regular expression }
+
+%%
+
+code that you want to insert at the END of lex.yy.cpp
+```
+
+### How to run?
+
+```
+jlex ./example/example.l
+cc -o test ./lex.yy.cpp
+test ./example/example.c
+```
+
+## Example
+
+A simple example for C language has been put in `./example` folder.
