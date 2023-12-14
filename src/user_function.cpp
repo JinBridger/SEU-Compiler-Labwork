@@ -6,6 +6,7 @@
 
 std::string yyin;
 std::string file_content;
+std::string yytext;
 
 void load_file() {
     std::ifstream      fs(yyin);

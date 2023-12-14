@@ -3,6 +3,9 @@
 
 #include <functional>
 #include <map>
+#include <string>
+
+extern std::string yytext;
 
 struct runnable_fa {
     runnable_fa(fa f) : _fa(f), _current_state(0) {}
@@ -46,6 +49,7 @@ public:
                     else {
                         exec.reset();
                         reseted = true;
+                        yytext  = "";
                         continue;
                     }
                 }
@@ -53,8 +57,11 @@ public:
                 table[result]();
                 exec.reset();
                 reseted = true;
+                yytext  = "";
                 continue;
             }
+
+            yytext += s[pos];
 
             if (pos == s.length() - 1) {
                 int result = exec._fa._accept_status[exec._current_state];

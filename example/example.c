@@ -1,8 +1,9 @@
 int main() {
-    int i    = 2;
-    int loop = 0;
-    int a[10][10];
-    int x;
+    float p    = 1.1;
+    int   i    = 2;
+    int   loop = 0;
+    int   a[10][10];
+    int   x;
     while (loop == 0 && i <= 10) {
         int j = 1;
         while (loop == 0 && j < i)

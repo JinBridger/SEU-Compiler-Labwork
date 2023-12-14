@@ -17,6 +17,10 @@
 #include <utility>
 #include <vector>
 
+std::string yytext;
+std::string yyin;
+std::string file_content;
+
 // fa.hpp
 
 // actually, it is a graph
@@ -678,6 +682,7 @@ public:
                     else {
                         exec.reset();
                         reseted = true;
+                        yytext  = "";
                         continue;
                     }
                 }
@@ -685,8 +690,11 @@ public:
                 table[result]();
                 exec.reset();
                 reseted = true;
+                yytext  = "";
                 continue;
             }
+
+            yytext += s[pos];
 
             if (pos == s.length() - 1) {
                 int result = exec._fa._accept_status[exec._current_state];
@@ -740,9 +748,6 @@ private:
 };
 
 // user_function.cpp
-
-std::string yyin;
-std::string file_content;
 
 void load_file() {
     std::ifstream      fs(yyin);

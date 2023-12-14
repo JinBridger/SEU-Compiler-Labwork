@@ -84,9 +84,9 @@ static     →  { std::cout << "MATCH: static" << std::endl; }
 ++         →  { std::cout << "MATCH: ++" << std::endl; }                   
 --         →  { std::cout << "MATCH: --" << std::endl; }                   
 
-(0-9)*                        →  { std::cout << "MATCH: integer" << std::endl; }
-(0-9)*.(0-9)*                 →  { std::cout << "MATCH: float" << std::endl; }
-(A-Z|a-z|_)(A-Z|a-z|0-9|_)*   →  { std::cout << "MATCH: identifier" << std::endl; }
+(0-9)*                        →  { std::cout << "MATCH: integer: " + yytext << std::endl; }
+(0-9)*.(0-9)*                 →  { std::cout << "MATCH: float: " + yytext << std::endl; }
+(A-Z|a-z|_)(A-Z|a-z|0-9|_)*   →  { std::cout << "MATCH: identifier: " + yytext << std::endl; }
 
 %%
 
