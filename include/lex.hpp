@@ -7,6 +7,7 @@
 #include "regexpr.hpp"
 #include "runner.hpp"
 
+#include <cstdlib>
 #include <functional>
 #include <map>
 #include <string>
@@ -36,10 +37,9 @@ public:
 
         int res = runner::run(min_dfa, prog, table);
         if (res == -1) {
-            std::cout << "ERROR!" << std::endl;
-            return;
+            exit(1);
         }
-        std::cout << "EOF" << std::endl;
+        // std::cout << "EOF" << std::endl;
     }
 
 private:

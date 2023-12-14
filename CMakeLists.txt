@@ -4,6 +4,7 @@ project(SEU-Compiler-Labwork)
 
 include_directories(./include)
 
-add_executable(lexical_analyzer src/lexical_analyzer.cpp)
+add_executable(jlex src/jlex.cpp)
+target_sources(jlex PRIVATE src/user_function.cpp)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
